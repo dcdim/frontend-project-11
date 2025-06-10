@@ -1,4 +1,4 @@
-import render from './view.js'
+import render from './view.js';
 
 export default () => {
     render();
