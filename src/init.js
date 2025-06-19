@@ -1,8 +1,8 @@
-import onChange from 'on-change';
 import * as yup from 'yup';
 import i18n from 'i18next';
 import resources from '../locales/index.js';
 import locale from '../locales/yupLocale.js';
+import watch from './watchers.js';
 
 export default () => {
   const state = {
@@ -11,19 +11,10 @@ export default () => {
       error: '',
     },
     feed: {
-      urls: [],
+      urls: new Set(),
     },
     language: 'en',
   };
-
-  const i18nextInstance = i18n.createInstance();
-  i18nextInstance.init({
-    lng: state.language,
-    resources,
-  });
-  yup.setLocale(locale);
-
-  const schema = yup.string().url().required();
 
   const elements = {
     form: document.querySelector('form'),
@@ -40,6 +31,17 @@ export default () => {
     },
   };
 
+  const i18nextInstance = i18n.createInstance();
+  i18nextInstance.init({
+    lng: state.language,
+    resources,
+  });
+
+  yup.setLocale(locale);
+
+  const schema = yup.string().url().required();
+
+
   const loadTranslation = () => {
     Object.keys(elements.textNodes)
       .forEach((nodeName) => {
@@ -50,25 +52,7 @@ export default () => {
 
   loadTranslation();
 
-  const watchedState = onChange(state, (path) => {
-    switch (path) {
-      case 'form.error':
-        if (watchedState.form.error) {
-          elements.input.classList.add('is-invalid');
-          elements.feedback.textContent = watchedState.form.error;
-          elements.feedback.classList.remove('text-success');
-          elements.feedback.classList.add('text-danger');
-        } else {
-          elements.input.classList.remove('is-invalid');
-          elements.feedback.textContent = 'RSS успешно загружен';
-          elements.feedback.classList.add('text-success');
-          elements.feedback.classList.remove('text-danger');
-        }
-        break;
-      default:
-        console.log(path);
-    }
-  });
+  const watchedState = watch(elements, state);
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -77,7 +61,7 @@ export default () => {
       .validate(watchedState.form.value, { abortEarly: false })
       .then((url) => {
         watchedState.form.error = '';
-        watchedState.feed.urls.push(url);
+        watchedState.feed.urls.add(url);
         elements.form.reset();
         elements.input.focus();
       })
