@@ -3,6 +3,7 @@ import i18n from 'i18next';
 import resources from '../locales/index.js';
 import locale from '../locales/yupLocale.js';
 import watch from './watchers.js';
+import getRss from './rss.js';
 
 export default () => {
   const state = {
@@ -10,9 +11,8 @@ export default () => {
       value: '',
       error: '',
     },
-    feed: {
-      urls: new Set(),
-    },
+    urls: new Set(),
+    feeds: [],
     language: 'en',
   };
 
@@ -41,7 +41,6 @@ export default () => {
 
   const schema = yup.string().url().required();
 
-
   const loadTranslation = () => {
     Object.keys(elements.textNodes)
       .forEach((nodeName) => {
@@ -52,18 +51,19 @@ export default () => {
 
   loadTranslation();
 
-  const watchedState = watch(elements, state);
+  const watchedState = watch(elements, state, i18nextInstance);
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
     watchedState.form.value = elements.input.value;
-    schema.notOneOf(state.feed.urls)
+    schema.notOneOf(state.urls)
       .validate(watchedState.form.value, { abortEarly: false })
       .then((url) => {
         watchedState.form.error = '';
-        watchedState.feed.urls.add(url);
+        watchedState.urls.add(url);
         elements.form.reset();
         elements.input.focus();
+        getRss(watchedState.form.value, i18nextInstance, watchedState);
       })
       .catch((err) => {
         const messages = err.errors.map((error) => i18nextInstance.t(`errors.${error.key}`));
