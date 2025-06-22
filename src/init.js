@@ -20,6 +20,8 @@ export default () => {
     form: document.querySelector('form'),
     input: document.querySelector('#url-input'),
     feedback: document.querySelector('.feedback'),
+    posts: document.querySelector('.posts'),
+    feeds: document.querySelector('.feeds'),
     textNodes: {
       heading: document.querySelector('h1[class="display-3 mb-0"]'),
       subheading: document.querySelector('p[class="lead"]'),
@@ -36,7 +38,6 @@ export default () => {
     lng: state.language,
     resources,
   });
-
   yup.setLocale(locale);
 
   const schema = yup.string().url().required();

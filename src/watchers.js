@@ -1,4 +1,4 @@
-import onChange from "on-change";
+import onChange from 'on-change';
 import { renderFeeds } from './rss.js';
 
 export default (elements, state, i18nInstance) => {
