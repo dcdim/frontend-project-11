@@ -13,6 +13,7 @@ export default () => {
     },
     urls: new Set(),
     feeds: [],
+    posts: [],
     language: 'en',
   };
 
@@ -47,9 +48,15 @@ export default () => {
           .then((response) => response.json())
           .then((data) => {
             const newPosts = parseRss(data).posts;
-            const postTitles = watchedState.feeds[i].posts.map((post) => post.title);
+            const postTitles = watchedState.posts[i].posts.map((post) => post.title);
             const uniquePosts = newPosts.filter((newPost) => !postTitles.includes(newPost.title));
-            watchedState.feeds[i].posts = [...watchedState.feeds[i].posts, ...uniquePosts];
+            const updatedPosts = watchedState.posts.map((post, index) => {
+              if (index === i) {
+                return { ...post, posts: [...post.posts, ...uniquePosts] };
+              }
+              return post;
+            });
+            watchedState.posts = updatedPosts;
           })
           .catch((e) => console.log(e)));
     }
@@ -88,5 +95,14 @@ export default () => {
       });
   });
   elements.input.focus();
+
+  elements.input.addEventListener('invalid', (e) => {
+    if (e.target.value.length === 0) {
+      e.target.setCustomValidity(i18nextInstance.t('errors.required'));
+    }
+  });
+  elements.input.addEventListener('input', (e) => {
+    e.target.setCustomValidity('');
+  });
   checkRssUpdates(watchedState, 5000);
 };

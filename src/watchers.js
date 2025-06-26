@@ -17,7 +17,7 @@ export default (elements, state, i18nInstance) => {
           elements.feedback.classList.remove('text-danger');
         }
         break;
-      case 'feeds':
+      case 'posts':
         renderFeeds(watchedState, elements, i18nInstance);
         break;
       default:
