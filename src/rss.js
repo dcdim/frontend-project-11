@@ -9,6 +9,9 @@ export const parseRss = (data) => {
     href: post.querySelector('link').textContent,
     id: _.uniqueId(),
   }));
+  if (posts.length === 0) {
+    throw new Error('noData');
+  }
   const title = parsedData.querySelector('title').textContent;
   const description = parsedData.querySelector('description').textContent;
   return { title, description, posts };
@@ -80,6 +83,9 @@ export const renderFeeds = (watchedState, elements, i18nextInstance) => {
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     const a = document.createElement('a');
     post.readed ? a.classList.add('fw-normal', 'link-secondary') : a.classList.add('fw-bold');
+    if (post.readed) {
+      a.classList.add('fw-normal', 'link-secondary');
+    } else a.classList.add('fw-bold');
     a.setAttribute('data-id', post.id);
     a.textContent = post.title;
     const btn = document.createElement('button');
@@ -120,7 +126,6 @@ export default (link, i18nextInstance, watchedState) => {
       throw new Error('Network response was not ok.');
     })
     .then((data) => {
-      if (data.status.http_code === 404) throw new Error('noData');
       const { title, description, posts } = parseRss(data);
       watchedState.feeds.push({ title, description });
       watchedState.posts = watchedState.posts.concat(posts);
