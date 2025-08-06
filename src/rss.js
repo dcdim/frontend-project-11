@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import _ from "lodash";
+import _ from 'lodash';
 
 export const parseRss = (data) => {
   const parser = new DOMParser();
