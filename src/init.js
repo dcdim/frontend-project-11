@@ -58,6 +58,7 @@ export default () => {
             const postTitles = watchedState.posts.map((post) => post.title);
             const uniquePosts = posts.filter((newPost) => !postTitles.includes(newPost.title));
             const updatedPosts = watchedState.posts.concat(uniquePosts);
+            // eslint-disable-next-line no-param-reassign
             watchedState.posts = updatedPosts;
           })
           .catch((e) => console.log(e)));
